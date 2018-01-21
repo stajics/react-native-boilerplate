@@ -1,8 +1,9 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { Alert, View, Image, ActivityIndicator, TextInput, Text, TouchableOpacity, StyleSheet, AsyncStorage, Platform, Button } from 'react-native';
+// import firebase from 'react-native-firebase';
+import { Alert, View, ActivityIndicator, TextInput, Text, StyleSheet, Button } from 'react-native';
 // utils
-import { isEmpty, get } from 'lodash';
+import { get, isEmpty } from 'lodash';
 // redux
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
@@ -17,6 +18,7 @@ const mapStateToProps = state => ({
 
 const actionCreators = {
   login: authActions.login,
+  logout: authActions.logout,
 };
 const mapDispatchToProps = dispatch => ({ actions: bindActionCreators(actionCreators, dispatch) });
 
@@ -58,11 +60,6 @@ class LoginForm extends Component {
     };
   }
 
-  async componentDidMount() {
-    const token = await AsyncStorage.getItem('niftyToken');
-    // if (token) this.props.history.replace('/teamSelect', { noAnimation: true });
-  }
-
   _validateInputs = () => {
     const { email, password } = this.state;
     if (isEmpty(email) || isEmpty(password)) throw { errors: [{ messages: ['Type in email and password'] }] }; // eslint-disable-line
@@ -81,13 +78,13 @@ class LoginForm extends Component {
     try {
       this._validateInputs();
       const res = await this.props.actions.login(email, password);
-      // await AsyncStorage.setItem('niftyToken', res.payload.data.token);
+      if (res.error) throw res;
       // this.props.history.push('/home');
     } catch (e) {
       if (e.toString() === 'TypeError: Network request failed') {
         Alert.alert('', 'Check network connection.');
       } else if (e.error) {
-        Alert.alert('', get(e, 'payload.error.details.message') || get(e, 'payload.data.message'));
+        Alert.alert('', get(e, 'payload.message'));
       } else {
         Alert.alert('', get(e, 'errors[0].messages[0]'));
       }
