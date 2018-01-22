@@ -51,6 +51,10 @@ const styles = StyleSheet.create({
 });
 
 class LoginForm extends Component {
+  static navigationOptions = {
+    header: null,
+  };
+
   constructor(props) {
     super(props);
     this.state = {
@@ -79,7 +83,6 @@ class LoginForm extends Component {
       this._validateInputs();
       const res = await this.props.actions.login(email, password);
       if (res.error) throw res;
-      // this.props.history.push('/home');
     } catch (e) {
       if (e.toString() === 'TypeError: Network request failed') {
         Alert.alert('', 'Check network connection.');

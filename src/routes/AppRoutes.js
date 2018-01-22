@@ -1,13 +1,27 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import firebase from 'react-native-firebase';
 import { View, StyleSheet } from 'react-native';
+import { StackNavigator, NavigationActions } from 'react-navigation';
+import firebase from 'react-native-firebase';
 // redux
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import { actions as authActions, selectors as authSelectors } from '../redux/modules/authModule';
-// assets
-// import globalStyles from '../assets/styles';
+// containers
+import ModalManager from '../containiers/ModalManager';
+import LoginForm from '../containiers/LoginForm';
+import HomeContainer from '../containiers/HomeContainer';
+
+const RoutesStack = StackNavigator({
+  Login: {
+    screen: LoginForm,
+  },
+  Home: {
+    screen: HomeContainer,
+  },
+}, {
+  initialRouteName: 'Login',
+});
 
 const mapStateToProps = state => ({
   user: authSelectors.user(state),
@@ -27,12 +41,14 @@ const styles = StyleSheet.create({
   },
 });
 
-
-class AppContainer extends Component {
+class AppRoutes extends Component {
   componentDidMount() {
     const { actions } = this.props;
     this.unsubscriber = firebase.auth().onAuthStateChanged((user) => {
       actions.updateUser(user);
+      if (user) {
+        this.navigator.dispatch(NavigationActions.navigate({ routeName: 'Home' }));
+      }
     });
   }
 
@@ -43,18 +59,17 @@ class AppContainer extends Component {
   }
 
   render() {
-    const { children } = this.props;
     return (
       <View style={[styles.container]}>
-        { children }
+        <ModalManager />
+        <RoutesStack ref={(nav) => { this.navigator = nav; }} />
       </View>
     );
   }
 }
 
-AppContainer.propTypes = {
+AppRoutes.propTypes = {
   actions: PropTypes.object.isRequired,
-  children: PropTypes.node,
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(AppContainer);
+export default connect(mapStateToProps, mapDispatchToProps)(AppRoutes);
