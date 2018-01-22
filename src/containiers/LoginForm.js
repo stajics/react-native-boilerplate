@@ -1,5 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
+import { AccessToken, LoginManager } from 'react-native-fbsdk';
+import firebase from 'react-native-firebase';
 // import firebase from 'react-native-firebase';
 import { Alert, View, ActivityIndicator, TextInput, Text, StyleSheet, Button } from 'react-native';
 // utils
@@ -77,6 +79,24 @@ class LoginForm extends Component {
     this.setState({ focused: inputName });
   }
 
+  handleFacebookLogin = async () => {
+    try {
+      console.log(LoginManager.logInWithReadPermissions);
+      const loginResult = await LoginManager.logInWithReadPermissions(['public_profile', 'email']);
+      if (!loginResult.isCancelled) {
+        console.log(`Login success with permissions: ${loginResult.grantedPermissions.toString()}`);
+        // get the access token
+        const accessToken = await AccessToken.getCurrentAccessToken();
+        // create a new firebase credential with the token
+        const credential = firebase.auth.FacebookAuthProvider.credential(accessToken.accessToken);
+        // login with credential
+        await firebase.auth().signInWithCredential(credential);
+      }
+    } catch (error) {
+      console.log(`Login fail with error: ${error}`);
+    }
+  }
+
   handleOnPressLogin = async () => {
     const { email, password } = this.state;
     try {
@@ -140,6 +160,10 @@ class LoginForm extends Component {
             onPress={this.handleOnPressLogin}
           />
         }
+        <Button
+          title="Facebook Login"
+          onPress={this.handleFacebookLogin}
+        />
       </View>
     );
   }

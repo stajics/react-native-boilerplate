@@ -8,11 +8,12 @@
   },
   "dependencies": {
     "lodash": "^4.17.4",
-    "metro": "0.24.6",
+    "metro": "^0.24.6",
     "prop-types": "^15.6.0",
     "query-string": "^5.0.1",
     "react": "16.2.0",
     "react-native": "0.52.0",
+    "react-native-fbsdk": "^0.7.0",
     "react-native-firebase": "^3.2.2",
     "react-navigation": "^1.0.0-beta.27",
     "react-redux": "^5.0.6",
