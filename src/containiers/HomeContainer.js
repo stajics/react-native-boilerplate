@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { View, Button, StyleSheet } from 'react-native';
-import { NavigationActions } from 'react-navigation';
 // redux
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
@@ -17,7 +16,7 @@ const mapStateToProps = state => ({
 const actionCreators = {
   logout: authActions.logout,
 };
-const mapDispatchToProps = dispatch => ({ actions: bindActionCreators(actionCreators, dispatch) });
+const mapDispatchToProps = dispatch => ({ actions: bindActionCreators(actionCreators, dispatch), dispatch });
 
 const styles = StyleSheet.create({
   container: {
@@ -36,16 +35,9 @@ class HomeContainer extends Component {
 
   handleOnPressLogout = async () => {
     try {
-      const { actions, navigation } = this.props;
+      const { actions } = this.props;
       const res = await actions.logout();
       if (res.error) throw res;
-      const resetAction = NavigationActions.reset({
-        index: 0,
-        actions: [
-          NavigationActions.navigate({ routeName: 'Login' }),
-        ],
-      });
-      navigation.dispatch(resetAction);
     } catch (e) {
       console.log(e);
     }
@@ -65,7 +57,6 @@ class HomeContainer extends Component {
 
 HomeContainer.propTypes = {
   actions: PropTypes.object.isRequired,
-  navigation: PropTypes.object.isRequired,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(HomeContainer);
