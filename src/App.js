@@ -62,7 +62,9 @@ class App extends Component {
             },
           }));
         } else {
-          dispatch(NavigationActions.navigate({ routeName: 'Home' }));
+          dispatch(NavigationActions.navigate({
+            routeName: 'Home',
+          }));
         }
       }
     });

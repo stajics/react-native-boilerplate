@@ -1,5 +1,5 @@
 import firebase from 'react-native-firebase';
-import NavigatorHelper from '../../helpers/navigatorHelper';
+import { NavigationActions } from 'react-navigation';
 // Constants
 
 export const constants = {
@@ -52,7 +52,14 @@ export const actions = {
   logout: () => async (dispatch) => {
     try {
       await firebase.auth().signOut();
-      NavigatorHelper.reset('Login', dispatch);
+      dispatch(NavigationActions.reset({
+        index: 0,
+        actions: [
+          NavigationActions.navigate({
+            routeName: 'Login',
+          }),
+        ],
+      }));
       return dispatch({ type: constants.LOGOUT });
     } catch (error) {
       return dispatch({ type: constants.LOGOUT });

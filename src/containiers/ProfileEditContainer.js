@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import firebase from 'react-native-firebase';
 import { get, isEmpty } from 'lodash';
+import { NavigationActions } from 'react-navigation';
 // redux
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
@@ -10,7 +11,6 @@ import { actions as authActions, selectors as authSelectors } from '../redux/mod
 import ProfileEdit from '../components/ProfileEdit';
 // helpers
 import { errorAlert } from '../helpers/alertHelper';
-import NavigatorHelper from '../helpers/navigatorHelper';
 
 const mapStateToProps = state => ({
   user: authSelectors.user(state),
@@ -84,9 +84,16 @@ class ProfileEditContainer extends Component {
 
       if (isSignup) {
         // TODO redirect to intro
-        NavigatorHelper.reset('Home', dispatch);
+        dispatch(NavigationActions.reset({
+          index: 0,
+          actions: [
+            NavigationActions.navigate({
+              routeName: 'Home',
+            }),
+          ],
+        }));
       } else {
-        NavigatorHelper.goBack(dispatch);
+        dispatch(NavigationActions.back());
       }
     } catch (e) {
       errorAlert(e);

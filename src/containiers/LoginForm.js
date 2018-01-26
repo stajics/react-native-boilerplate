@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { AccessToken, LoginManager } from 'react-native-fbsdk';
+import { NavigationActions } from 'react-navigation';
 import firebase from 'react-native-firebase';
 // import firebase from 'react-native-firebase';
 import { View, ActivityIndicator, TextInput, Text, StyleSheet, Button } from 'react-native';
@@ -14,7 +15,6 @@ import { actions as authActions, selectors as authSelectors } from '../redux/mod
 import { errorAlert } from '../helpers/alertHelper';
 // assets
 import globalStyles from '../assets/styles';
-import NavigatorHelper from '../helpers/navigatorHelper';
 
 const mapStateToProps = state => ({
   user: authSelectors.user(state),
@@ -113,7 +113,9 @@ class LoginForm extends Component {
 
   handleOnPressSignup = async () => {
     const { dispatch } = this.props;
-    NavigatorHelper.navigate('Signup', dispatch);
+    dispatch(NavigationActions.navigate({
+      routeName: 'Signup',
+    }));
   }
 
   render() {
