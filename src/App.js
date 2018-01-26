@@ -8,6 +8,7 @@ import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import { actions as authActions } from './redux/modules/authModule';
 import { selectors as navigatorSelectors } from './redux/modules/navigatorModule';
+import { selectors as appSelectors } from './redux/modules/appModule';
 // containers
 import LoginForm from './containiers/LoginForm';
 import SignupForm from './containiers/SignupForm';
@@ -33,6 +34,7 @@ export const AppNavigator = StackNavigator({
 
 const mapStateToProps = state => ({
   navigator: navigatorSelectors.navigator(state),
+  isStartingUp: appSelectors.isStartingUp(state),
 });
 
 const actionCreators = {
@@ -45,6 +47,13 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
+  appStartupLoading: {
+    position: 'absolute',
+    height: '100%',
+    width: '100%',
+    backgroundColor: 'red',
+    zIndex: 10,
+  },
 });
 
 class App extends Component {
@@ -55,15 +64,25 @@ class App extends Component {
       if (firebaseUser) {
         const user = await actions.getUser(firebaseUser._user.uid);
         if (!user || !user.completed) {
-          dispatch(NavigationActions.navigate({
-            routeName: 'ProfileEdit',
-            params: {
-              isSignup: true,
-            },
+          dispatch(NavigationActions.reset({
+            index: 0,
+            actions: [
+              NavigationActions.navigate({
+                routeName: 'ProfileEdit',
+                params: {
+                  isSignup: true,
+                },
+              }),
+            ],
           }));
         } else {
-          dispatch(NavigationActions.navigate({
-            routeName: 'Home',
+          dispatch(NavigationActions.reset({
+            index: 0,
+            actions: [
+              NavigationActions.navigate({
+                routeName: 'Home',
+              }),
+            ],
           }));
         }
       }
@@ -77,9 +96,10 @@ class App extends Component {
   }
 
   render() {
-    const { dispatch, navigator } = this.props;
+    const { dispatch, navigator, isStartingUp } = this.props;
     return (
       <View style={[styles.container]}>
+        {isStartingUp && <View style={[styles.appStartupLoading]} />}
         <AppNavigator navigation={addNavigationHelpers({
           dispatch,
           state: navigator,
@@ -94,6 +114,7 @@ App.propTypes = {
   actions: PropTypes.object.isRequired,
   dispatch: PropTypes.func.isRequired,
   navigator: PropTypes.object.isRequired,
+  isStartingUp: PropTypes.any,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(App);
