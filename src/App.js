@@ -6,16 +6,23 @@ import firebase from 'react-native-firebase';
 // redux
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
-import { actions as authActions, selectors as authSelectors } from './redux/modules/authModule';
+import { actions as authActions } from './redux/modules/authModule';
 import { selectors as navigatorSelectors } from './redux/modules/navigatorModule';
 // containers
-import ModalManager from './containiers/ModalManager';
 import LoginForm from './containiers/LoginForm';
+import SignupForm from './containiers/SignupForm';
 import HomeContainer from './containiers/HomeContainer';
+import ProfileEditContainer from './containiers/ProfileEditContainer';
 
 export const AppNavigator = StackNavigator({
   Login: {
     screen: LoginForm,
+  },
+  Signup: {
+    screen: SignupForm,
+  },
+  ProfileEdit: {
+    screen: ProfileEditContainer,
   },
   Home: {
     screen: HomeContainer,
@@ -26,14 +33,11 @@ export const AppNavigator = StackNavigator({
 
 const mapStateToProps = state => ({
   navigator: navigatorSelectors.navigator(state),
-  user: authSelectors.user(state),
-  isLoading: authSelectors.isLoading(state),
 });
 
 const actionCreators = {
   getUser: authActions.getUser,
-  setToken: authActions.setToken,
-  updateUser: authActions.updateUser,
+  setFirebaseUser: authActions.setFirebaseUser,
 };
 const mapDispatchToProps = dispatch => ({ actions: bindActionCreators(actionCreators, dispatch), dispatch });
 
@@ -46,10 +50,20 @@ const styles = StyleSheet.create({
 class App extends Component {
   componentDidMount() {
     const { actions, dispatch } = this.props;
-    this.unsubscriber = firebase.auth().onAuthStateChanged((user) => {
-      actions.updateUser(user);
-      if (user) {
-        dispatch(NavigationActions.navigate({ routeName: 'Home' }));
+    this.unsubscriber = firebase.auth().onAuthStateChanged(async (firebaseUser) => {
+      actions.setFirebaseUser(firebaseUser);
+      if (firebaseUser) {
+        const user = await actions.getUser(firebaseUser._user.uid);
+        if (!user || !user.completed) {
+          dispatch(NavigationActions.navigate({
+            routeName: 'ProfileEdit',
+            params: {
+              isSignup: true,
+            },
+          }));
+        } else {
+          dispatch(NavigationActions.navigate({ routeName: 'Home' }));
+        }
       }
     });
   }
@@ -64,7 +78,6 @@ class App extends Component {
     const { dispatch, navigator } = this.props;
     return (
       <View style={[styles.container]}>
-        <ModalManager />
         <AppNavigator navigation={addNavigationHelpers({
           dispatch,
           state: navigator,

@@ -2,14 +2,17 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { AccessToken, LoginManager } from 'react-native-fbsdk';
 import firebase from 'react-native-firebase';
+import { NavigationActions } from 'react-navigation';
 // import firebase from 'react-native-firebase';
-import { Alert, View, ActivityIndicator, TextInput, Text, StyleSheet, Button } from 'react-native';
+import { View, ActivityIndicator, TextInput, Text, StyleSheet, Button } from 'react-native';
 // utils
-import { get, isEmpty } from 'lodash';
+import { isEmpty } from 'lodash';
 // redux
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import { actions as authActions, selectors as authSelectors } from '../redux/modules/authModule';
+// helpers
+import { errorAlert } from '../helpers/alertHelper';
 // assets
 import globalStyles from '../assets/styles';
 
@@ -22,7 +25,7 @@ const actionCreators = {
   login: authActions.login,
   logout: authActions.logout,
 };
-const mapDispatchToProps = dispatch => ({ actions: bindActionCreators(actionCreators, dispatch) });
+const mapDispatchToProps = dispatch => ({ actions: bindActionCreators(actionCreators, dispatch), dispatch });
 
 const styles = StyleSheet.create({
   container: {
@@ -104,14 +107,13 @@ class LoginForm extends Component {
       const res = await this.props.actions.login(email, password);
       if (res.error) throw res;
     } catch (e) {
-      if (e.toString() === 'TypeError: Network request failed') {
-        Alert.alert('', 'Check network connection.');
-      } else if (e.error) {
-        Alert.alert('', get(e, 'payload.message'));
-      } else {
-        Alert.alert('', get(e, 'errors[0].messages[0]'));
-      }
+      errorAlert(e);
     }
+  }
+
+  handleOnPressSignup = async () => {
+    const { dispatch } = this.props;
+    dispatch(NavigationActions.navigate({ routeName: 'Signup' }));
   }
 
   render() {
@@ -163,6 +165,10 @@ class LoginForm extends Component {
         <Button
           title="Facebook Login"
           onPress={this.handleFacebookLogin}
+        />
+        <Button
+          title="Signup"
+          onPress={this.handleOnPressSignup}
         />
       </View>
     );
