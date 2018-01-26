@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { View, Button, StyleSheet } from 'react-native';
-import { NavigationActions } from 'react-navigation';
 import firebase from 'react-native-firebase';
 // redux
 import { bindActionCreators } from 'redux';
@@ -9,6 +8,8 @@ import { connect } from 'react-redux';
 import { actions as authActions, selectors as authSelectors } from '../redux/modules/authModule';
 // assets
 import globalStyles from '../assets/styles';
+// helpers
+import NavigatorHelper from '../helpers/navigatorHelper';
 
 const mapStateToProps = state => ({
   user: authSelectors.user(state),
@@ -61,6 +62,15 @@ class HomeContainer extends Component {
     }
   }
 
+  handleOnPressTest1 = async () => {
+    try {
+      const { dispatch } = this.props;
+      NavigatorHelper.navigate('ProfileEdit', dispatch);
+    } catch (e) {
+      console.log(e);
+    }
+  }
+
   handleOnPressLogout = async () => {
     try {
       const { actions } = this.props;
@@ -81,6 +91,10 @@ class HomeContainer extends Component {
         <Button
           title="Test"
           onPress={this.handleOnPressTest}
+        />
+        <Button
+          title="Test1"
+          onPress={this.handleOnPressTest1}
         />
       </View>
     );

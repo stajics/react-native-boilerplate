@@ -36,14 +36,30 @@ class ProfileEditContainer extends Component {
     this.users = firebase.firestore().collection('users');
   }
 
-  _validateInputs = (name, username, gender) => {
+  _validateInputs = async (name, username, gender, usernameBeforeEdit) => {
     if (isEmpty(name) || isEmpty(username) || isEmpty(gender)) throw { errors: [{ messages: ['Type in required fields'] }] }; // eslint-disable-line
+    const isUsernameValid = await this._isUsernameValid(username, usernameBeforeEdit);
+    if (!isUsernameValid) throw { errors: [{ messages: ['Username already taken.'] }] }; // eslint-disable-line
   }
 
-  handleProfileEdit = async (name, username, gender, quote) => {
+  _isUsernameValid = async (username, usernameBeforeEdit) => {
+    if (username.toLowerCase() === usernameBeforeEdit.toLowerCase()) return true;
+    if (!/^[A-Za-z0-9_.]{3,20}$/.test(username)) throw new Error('Bad username format (letters, numbers, _ . allowed)');
+    const userRef = await firebase.firestore().collection('users').where('username', '==', username).get();
+    if (!userRef.empty) {
+      return false;
+    }
+    const usernameQueryRef = await firebase.firestore().doc(`usernames/${username.toLowerCase()}`).get();
+    if (usernameQueryRef.exists) {
+      return false;
+    }
+    return true;
+  }
+
+  handleProfileEdit = async (name, username, gender, quote, usernameBeforeEdit) => {
     try {
       const { actions, dispatch } = this.props;
-      this._validateInputs(name, username, gender);
+      await this._validateInputs(name, username, gender, usernameBeforeEdit);
       const isSignup = get(this.props, 'navigation.state.params.isSignup');
       let user = null;
       if (isSignup) {

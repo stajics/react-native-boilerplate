@@ -30,6 +30,7 @@ class ProfileEdit extends Component {
     this.state = {
       name: props.name || '',
       username: props.username || '',
+      usernameBeforeEdit: props.username || '',
       gender: props.gender || 'male',
       quote: props.quote || '',
     };
@@ -46,7 +47,7 @@ class ProfileEdit extends Component {
   render() {
     const { onDonePress } = this.props;
     const {
-      name, username, gender, quote, focused,
+      name, username, usernameBeforeEdit, gender, quote, focused,
     } = this.state;
     return (
       <View style={[styles.container]}>
@@ -90,7 +91,7 @@ class ProfileEdit extends Component {
         />
         <Button
           title="Done"
-          onPress={() => onDonePress(name, username, gender, quote)}
+          onPress={() => onDonePress(name, username.toLowerCase(), gender, quote, usernameBeforeEdit)}
         />
       </View>
     );

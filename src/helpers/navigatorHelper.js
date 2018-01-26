@@ -14,6 +14,13 @@ class NavigatorHelper {
   goBack = (dispatch) => {
     dispatch(NavigationActions.back());
   }
+
+  navigate = (routeName, dispatch, params = {}) => {
+    dispatch(NavigationActions.navigate({
+      routeName,
+      params,
+    }));
+  }
 }
 
 const navigatorHelper = new NavigatorHelper();

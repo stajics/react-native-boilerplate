@@ -1,5 +1,5 @@
 import firebase from 'react-native-firebase';
-import { NavigationActions } from 'react-navigation';
+import NavigatorHelper from '../../helpers/navigatorHelper';
 // Constants
 
 export const constants = {
@@ -52,13 +52,7 @@ export const actions = {
   logout: () => async (dispatch) => {
     try {
       await firebase.auth().signOut();
-      const resetAction = NavigationActions.reset({
-        index: 0,
-        actions: [
-          NavigationActions.navigate({ routeName: 'Login' }),
-        ],
-      });
-      dispatch(resetAction);
+      NavigatorHelper.reset('Login', dispatch);
       return dispatch({ type: constants.LOGOUT });
     } catch (error) {
       return dispatch({ type: constants.LOGOUT });
@@ -78,7 +72,7 @@ export const actions = {
       dispatch({ type: constants.CREATE_USER_SUCCESS });
       return user;
     } catch (error) {
-      return dispatch({ type: constants.CREATE_USER_ERROR, payload: error, error: true });
+      return dispatch({ type: constants.CREATE_USER_ERROR, payload: new Error('Username already taken'), error: true });
     }
   },
   editUser: data => async (dispatch, getState) => {
@@ -98,7 +92,7 @@ export const actions = {
       dispatch({ type: constants.EDIT_USER_SUCCESS });
       return userRef._data;
     } catch (error) {
-      return dispatch({ type: constants.EDIT_USER_ERROR, payload: error, error: true });
+      return dispatch({ type: constants.EDIT_USER_ERROR, payload: new Error('Username already taken'), error: true });
     }
   },
   getUser: userId => async (dispatch) => {
