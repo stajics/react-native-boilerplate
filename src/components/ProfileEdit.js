@@ -1,8 +1,10 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { Picker, View, TextInput, StyleSheet, Button } from 'react-native';
+import { Picker, ImageBackground, TextInput, StyleSheet, Button } from 'react-native';
 // assets
 import globalStyles from '../assets/styles';
+
+const backgroundImg = require('../assets/images/background.png');
 
 const styles = StyleSheet.create({
   container: {
@@ -50,7 +52,10 @@ class ProfileEdit extends Component {
       name, username, usernameBeforeEdit, gender, quote, focused,
     } = this.state;
     return (
-      <View style={[styles.container]}>
+      <ImageBackground
+        source={backgroundImg}
+        style={[styles.container]}
+      >
         <TextInput
           style={[styles.textInput, (focused === 'name') && styles.textInputFocused]}
           value={name}
@@ -93,7 +98,7 @@ class ProfileEdit extends Component {
           title="Done"
           onPress={() => onDonePress(name, username.toLowerCase(), gender, quote, usernameBeforeEdit)}
         />
-      </View>
+      </ImageBackground>
     );
   }
 }

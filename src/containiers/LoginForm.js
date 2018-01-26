@@ -4,7 +4,7 @@ import { AccessToken, LoginManager } from 'react-native-fbsdk';
 import { NavigationActions } from 'react-navigation';
 import firebase from 'react-native-firebase';
 // import firebase from 'react-native-firebase';
-import { View, ActivityIndicator, TextInput, Text, StyleSheet, Button } from 'react-native';
+import { ImageBackground, ActivityIndicator, TextInput, Text, StyleSheet, Button } from 'react-native';
 // utils
 import { isEmpty } from 'lodash';
 // redux
@@ -15,6 +15,8 @@ import { actions as authActions, selectors as authSelectors } from '../redux/mod
 import { errorAlert } from '../helpers/alertHelper';
 // assets
 import globalStyles from '../assets/styles';
+
+const backgroundImg = require('../assets/images/background.png');
 
 const mapStateToProps = state => ({
   user: authSelectors.user(state),
@@ -128,7 +130,10 @@ class LoginForm extends Component {
       isLoading,
     } = this.props;
     return (
-      <View style={[styles.container]}>
+      <ImageBackground
+        source={backgroundImg}
+        style={[styles.container]}
+      >
         <Text style={[styles.loginTitleText]}>Log in</Text>
         <TextInput
           style={[styles.textInput, (focused === 'email') && styles.textInputFocused]}
@@ -172,7 +177,7 @@ class LoginForm extends Component {
           title="Signup"
           onPress={this.handleOnPressSignup}
         />
-      </View>
+      </ImageBackground>
     );
   }
 }
